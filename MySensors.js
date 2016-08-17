@@ -14,10 +14,6 @@ function MySensors(c,i) {
   this.connection.on('data',this.parse.bind(this));
 }
 
-MySensors.prototype.connect = function() {
-  this.emit('presentation');
-};
-
 MySensors.prototype.connection = {};
 
 MySensors.prototype.nodeId = {};
