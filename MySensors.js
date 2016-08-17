@@ -1,5 +1,3 @@
-//var exports = {};
-
 /* Copyright (c) 2016 Steven Lazidis. See the file LICENSE for copying permission. */
 /*
 MySensors module for Espruino
