@@ -49,6 +49,19 @@ MySensors.prototype.message = function(nodeId,sensor,type) {
   this.payload = "";
 };
 
+
+MySensors.prototype.newMessage = function(sensor,type) {
+  return {
+    nodeId:this.nodeId,
+    childSensorId:sensor,
+    messageType:1,
+    ack:false,
+    subType:type,
+    payload:""
+  }
+};
+
+
 MySensors.prototype.send = function(msg) {
   var output = msg.nodeId+";"+msg.childSensorId+";"+msg.messageType+";"+msg.ack+";"+msg.subType+";"+JSON.stringify(msg.payload)+"\n";
   this.connection.write(output);

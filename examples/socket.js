@@ -17,6 +17,7 @@ function connect() {
         console.log('client disconnected');
         connect();
       });
+      mys.emit('presentation');
     });
   },5000);
 }
