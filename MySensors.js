@@ -33,29 +33,19 @@ MySensors.prototype.parse = function(x) {
 };
 
 
-MySensors.prototype.present = function(id,sensorType) {
-  var msg = new this.message(this.nodeId,id,sensorType);
+MySensors.prototype.present = function(sensor,type) {
+  var msg = this.newMessage(sensor,type);
   msg.payload = "2.0";
   msg.messageType = 0;
   this.send(msg);
 };
-
-MySensors.prototype.message = function(nodeId,sensor,type) {
-  this.nodeId = nodeId;
-  this.childSensorId = sensor;
-  this.messageType = 1;
-  this.ack = false;
-  this.subType = type;
-  this.payload = "";
-};
-
 
 MySensors.prototype.newMessage = function(sensor,type) {
   return {
     nodeId:this.nodeId,
     childSensorId:sensor,
     messageType:1,
-    ack:false,
+    ack:0,
     subType:type,
     payload:""
   }
@@ -68,30 +58,36 @@ MySensors.prototype.send = function(msg) {
 };
 
 MySensors.prototype.handler = function(y) {
-  switch (y[2]) {
-    case "1":
-    case "2":
-      var msg = new this.message(y[1],y[2]);
-      msg.id = y[0];
-      msg.ack = y[3];
-      msg.subType = y[4];
-      msg.payload = y[5];
-      this.emit('receive',msg);
-      break;
-    case "3":
-      switch(y[4]) {
-        case "19":
-          this.emit('presentation');
-          break;
-        case "13":
-          // load();
-          break;
-        default:
-          console.log("message subtype not implemented:"+y);
-      }
-      break;
-    default:
-      console.log("message type not implemented:"+y);
+  if(y[0] == JSON.stringify(this.nodeId)) {
+    switch (y[2]) {
+      case "1":
+      case "2":
+        var msg = this.newMessage(y[1],y[4]);
+        msg.nodeId = y[0];
+        msg.ack = y[3];
+        msg.messageType = y[2];
+        msg.payload = y[5];
+        this.emit('receive',msg);
+        break;
+      case "3":
+        switch(y[4]) {
+          case "19":
+            this.emit('presentation');
+            break;
+          case "4":
+            var newId = JSON.parse(y[5]);
+            if (!isNAN(newId)) {
+              this.nodeId = newId;
+              this.emit('presentation');
+            }
+            break;
+          default:
+            console.log("message subtype not implemented:"+y);
+        }
+        break;
+      default:
+        console.log("message type not implemented:"+y);
+    }
   }
 };
 

@@ -24,4 +24,4 @@ events:
 
 on('presentation') - fires when controller requests presentation. Manually fire using mys.emit('presentation')
 
-on('receive') - fires when set/req message received
+on('receive',function(msg){}) - fires when set/req message received
