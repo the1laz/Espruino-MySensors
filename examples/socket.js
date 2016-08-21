@@ -10,7 +10,7 @@ function connect() {
 
       clearInterval(timeout);
 
-      mys = require("http://localhost:8080/MySensors.js?9").connect(client,3);
+      mys = require("MySensors").connect(client,3);
 
       mys.on('presentation',function() {
         mys.present(0,3);
