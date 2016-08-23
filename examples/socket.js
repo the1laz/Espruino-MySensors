@@ -33,12 +33,13 @@ function connect() {
   },5000);
 }
 
+E.on('init',function() {
+  connect();
 
-connect();
-
-setInterval(function() {
-  var msg = mys.newMessage(0,2);
-  msg.payload = led ? 1 : 0;
-  mys.send(msg);
-  console.log("LED is  " + (led ? "on" : "off"));
-},10000);
+  setInterval(function() {
+    var msg = mys.newMessage(0,2);
+    msg.payload = led ? 1 : 0;
+    mys.send(msg);
+    console.log("LED is  " + (led ? "on" : "off"));
+  },10000);
+})

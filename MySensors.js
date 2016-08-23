@@ -22,6 +22,7 @@ MySensors.prototype.fragment = "";
 
 
 MySensors.prototype.parse = function(x) {
+  print(x);
   var msgs = x.split("\n");
   msgs[0] = this.fragment + msgs[0];
   this.fragment = msgs.pop();
