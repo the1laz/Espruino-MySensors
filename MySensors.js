@@ -4,19 +4,19 @@ MySensors module for Espruino
 */
 
 
-function MySensors(c,i) {
+function MySensors(i) {
   if(isNaN(i) || i > 255) {
     this.nodeId = 255;
   } else {
     this.nodeId = i;
   }
-  this.connection = c;
-  this.connection.on('data',this.parse.bind(this));
 }
 
-MySensors.prototype.connection = {};
+MySensors.prototype.connection = {
+  write:function(){console.log("No Gateway");}
+};
 
-MySensors.prototype.nodeId = {};
+MySensors.prototype.nodeId = 255;
 
 MySensors.prototype.fragment = "";
 
@@ -54,8 +54,7 @@ MySensors.prototype.newMessage = function(sensor,type) {
 
 
 MySensors.prototype.send = function(msg) {
-  var output = msg.nodeId+";"+msg.childSensorId+";"+msg.messageType+";"+msg.ack+";"+msg.subType+";"+JSON.stringify(msg.payload)+"\n";
-  this.connection.write(output);
+  console.log("No Gateway");
 };
 
 MySensors.prototype.handler = function(y) {
@@ -93,7 +92,39 @@ MySensors.prototype.handler = function(y) {
 };
 
 
+MySensors.prototype.setMqttGW = function(g,p,s) {
+  this.connection = g;
+  this.pubtopic = p;
+  this.subtopic = s;
+  this.connection.on('message',(function(msg){
+    var parts = msg.topic.split("/").slice(1);
+    this.parse(parts.join(";")+";"+msg.message+"\n")
+  }).bind(this));
+  this.send = (function(msg){
+    this.connection.publish(
+      this.pubtopic+"/"+msg.nodeId+"/"+msg.childSensorId+"/"+msg.messageType+"/"+msg.ack+"/"+msg.subType,
+      JSON.stringify(msg.payload)
+    );
+  }).bind(this);
+  this.connection.subscribe(this.subtopic+"/+/+/+/+/+");
+  this.emit('presentation');
+}
 
-exports.connect = function (c,i) {
-  return new MySensors(c,i);
+MySensors.prototype.setSerialGW = function(g) {
+  this.connection = g;
+  this.connection.on('data',this.parse.bind(this));
+  this.send = (function(msg){
+    var output = msg.nodeId+";"+msg.childSensorId+";"+msg.messageType+";"+msg.ack+";"+msg.subType+";"+JSON.stringify(msg.payload)+"\n";
+    this.connection.write(output);
+  }).bind(this);
+  this.emit('presentation');
+}
+
+MySensors.prototype.disconnectGW = function() {
+  this.connection = {};
+  this.send = function(){console.log("No Gateway");}
+}
+
+exports.create = function (i) {
+  return new MySensors(i);
 };
