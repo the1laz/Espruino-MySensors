@@ -30,7 +30,7 @@ on('presentation') - fires when controller requests presentation. Manually fire 
 on('receive',function(msg){}) - fires when set/req message received
 ~~~~
 
-**Example**
+**TCP Example:**
 ~~~~
 var interval = {};var socket = {};var led = false;
 
